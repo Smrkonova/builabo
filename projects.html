@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects — BuildAbo Construction & Interiors</title>
+    <meta
+      name="description"
+      content="Selected residential and commercial projects by BuildAbo — villas, apartments, kitchens, bathrooms, offices and retail spaces."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <div id="site-header"></div>
+      <main class="main">
+        <section class="page-hero">
+          <div class="container">
+            <p class="eyebrow">Portfolio</p>
+            <h1>Built with care.<br />Photographed honestly.</h1>
+            <p class="lead">
+              A selection of recent work across residential, interior and
+              commercial. Every image is from a real BuildAbo project.
+            </p>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="container">
+            <div class="projects-grid" id="projectsGrid"></div>
+            <div class="loading-msg hidden" id="loadingMore">Loading more projects...</div>
+            <div class="projects-footer">
+              <h2>Want to see more, or visit a completed project?</h2>
+              <a href="contact.html" class="btn-primary">Request the full portfolio</a>
+            </div>
+          </div>
+        </section>
+      </main>
+      <div id="site-footer"></div>
+    </div>
+    <script src="site.js"></script>
+    <script>
+      BuildAbo.renderHeader("site-header");
+      BuildAbo.renderFooter("site-footer");
+
+      const grid = document.getElementById("projectsGrid");
+      let page = 1;
+      let hasMore = true;
+      let loading = false;
+      let projects = [];
+
+      function render() {
+        grid.innerHTML = projects
+          .map(
+            (p) => `
+          <a href="project.html?id=${encodeURIComponent(p._id)}">
+            <div class="thumb"><img src="${p.image}" alt="${p.title}" loading="lazy" /></div>
+            <div class="project-meta">
+              <div>
+                <p class="cat">${p.category || ""}</p>
+                <h2>${p.title}</h2>
+                <p class="sub">${[p.location, p.sqft].filter(Boolean).join(" · ")}</p>
+              </div>
+              <span class="year">${p.year || ""}</span>
+            </div>
+          </a>`
+          )
+          .join("");
+      }
+
+      async function fetchProjects() {
+        if (!hasMore || loading) return;
+        loading = true;
+        document.getElementById("loadingMore").classList.toggle("hidden", page === 1);
+
+        try {
+          const res = await fetch(`${BuildAbo.API_URL}/projects?page=${page}&limit=6`);
+          const data = await res.json();
+          if (data.success && data.projects?.length) {
+            projects = projects.concat(data.projects);
+            hasMore = Boolean(data.hasMore);
+            render();
+            return;
+          }
+        } catch (_) {}
+
+        if (page === 1) {
+          projects = BuildAbo.FALLBACK_PROJECTS.slice();
+          hasMore = false;
+          render();
+        } else {
+          hasMore = false;
+        }
+      }
+
+      window.addEventListener("scroll", () => {
+        if (
+          window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 &&
+          hasMore &&
+          !loading
+        ) {
+          page += 1;
+          fetchProjects().finally(() => {
+            loading = false;
+            document.getElementById("loadingMore").classList.add("hidden");
+          });
+        }
+      });
+
+      fetchProjects().finally(() => {
+        loading = false;
+        document.getElementById("loadingMore").classList.add("hidden");
+      });
+    </script>
+  </body>
+</html>
