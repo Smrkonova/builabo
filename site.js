@@ -68,8 +68,11 @@
       el.innerHTML = `
       <header class="site-header">
         <div class="container header-inner">
-          <a href="index.html" class="brand">
-            <img src="assets/logo-light.png" alt="Build Abo Construction & Interiors" class="brand-logo" />
+          <a href="index.html" class="brand" aria-label="BuildAbo Construction and Interiors">
+            <span class="brand-mark-wrap">
+              <img src="assets/logo-light.png" alt="" class="brand-mark-img" aria-hidden="true" />
+            </span>
+            <span class="brand-name">BuildAbo</span>
           </a>
           <nav class="nav-desktop" aria-label="Primary">
             ${navLink("index.html", "Home")}

@@ -129,12 +129,35 @@ textarea {
 .brand {
   display: flex;
   align-items: center;
+  gap: 0.625rem;
 }
 
-.brand-logo {
+.brand-mark-wrap {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
   height: 2.75rem;
-  width: auto;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  padding: 0.2rem;
+}
+
+.brand-mark-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: block;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .nav-desktop {
