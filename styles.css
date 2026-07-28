@@ -129,20 +129,12 @@ textarea {
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
 }
 
-.brand img {
-  height: 3rem;
-  width: 3rem;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-}
-
-.brand span {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  letter-spacing: 0.025em;
+.brand-logo {
+  height: 2.75rem;
+  width: auto;
+  display: block;
 }
 
 .nav-desktop {
@@ -748,6 +740,15 @@ textarea {
   color: var(--accent);
 }
 
+.phone-line {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.phone-line a:hover {
+  color: var(--accent);
+}
+
 .form-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -855,13 +856,10 @@ textarea {
   padding-block: 4.5rem;
 }
 
-.footer-brand img {
-  height: 3.5rem;
-  width: 3.5rem;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  background: color-mix(in oklch, var(--primary-foreground) 5%, transparent);
-  padding: 0.25rem;
+.footer-logo {
+  height: 3rem;
+  width: auto;
+  display: block;
 }
 
 .footer-brand .tagline {

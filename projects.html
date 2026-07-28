@@ -28,7 +28,8 @@
         <section class="section">
           <div class="container">
             <div class="projects-grid" id="projectsGrid"></div>
-            <div class="loading-msg hidden" id="loadingMore">Loading more projects...</div>
+            <div class="loading-msg" id="loadingMsg">Loading projects…</div>
+            <div class="loading-msg hidden" id="loadingMore">Loading more projects…</div>
             <div class="projects-footer">
               <h2>Want to see more, or visit a completed project?</h2>
               <a href="contact.html" class="btn-primary">Request the full portfolio</a>
@@ -44,47 +45,70 @@
       BuildAbo.renderFooter("site-footer");
 
       const grid = document.getElementById("projectsGrid");
+      const loadingMsg = document.getElementById("loadingMsg");
+      const loadingMore = document.getElementById("loadingMore");
       let page = 1;
       let hasMore = true;
       let loading = false;
       let projects = [];
 
-      function render() {
-        grid.innerHTML = projects
-          .map(
-            (p) => `
+      function cardHtml(p) {
+        const sub = [p.location, p.sqft].filter(Boolean).join(" · ");
+        return `
           <a href="project.html?id=${encodeURIComponent(p._id)}">
             <div class="thumb"><img src="${p.image}" alt="${p.title}" loading="lazy" /></div>
             <div class="project-meta">
               <div>
                 <p class="cat">${p.category || ""}</p>
                 <h2>${p.title}</h2>
-                <p class="sub">${[p.location, p.sqft].filter(Boolean).join(" · ")}</p>
+                <p class="sub">${sub}</p>
               </div>
               <span class="year">${p.year || ""}</span>
             </div>
-          </a>`
-          )
-          .join("");
+          </a>`;
+      }
+
+      function render() {
+        if (!projects.length) {
+          grid.innerHTML = "";
+          return;
+        }
+        grid.innerHTML = projects.map(cardHtml).join("");
+      }
+
+      function setLoading(isFirstPage, active) {
+        if (isFirstPage) {
+          loadingMsg.classList.toggle("hidden", !active);
+        } else {
+          loadingMore.classList.toggle("hidden", !active);
+        }
       }
 
       async function fetchProjects() {
         if (!hasMore || loading) return;
         loading = true;
-        document.getElementById("loadingMore").classList.toggle("hidden", page === 1);
+        const isFirstPage = page === 1;
+        setLoading(isFirstPage, true);
 
         try {
-          const res = await fetch(`${BuildAbo.API_URL}/projects?page=${page}&limit=6`);
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
+          const res = await fetch(
+            `${BuildAbo.API_URL}/projects?page=${page}&limit=6`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeout);
           const data = await res.json();
-          if (data.success && data.projects?.length) {
-            projects = projects.concat(data.projects);
+          if (data.success && Array.isArray(data.projects) && data.projects.length) {
+            projects = isFirstPage ? data.projects : projects.concat(data.projects);
             hasMore = Boolean(data.hasMore);
+            page += 1;
             render();
             return;
           }
         } catch (_) {}
 
-        if (page === 1) {
+        if (isFirstPage && !projects.length) {
           projects = BuildAbo.FALLBACK_PROJECTS.slice();
           hasMore = false;
           render();
@@ -93,24 +117,23 @@
         }
       }
 
+      function finishLoading() {
+        loading = false;
+        loadingMsg.classList.add("hidden");
+        loadingMore.classList.add("hidden");
+      }
+
       window.addEventListener("scroll", () => {
         if (
           window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 &&
           hasMore &&
           !loading
         ) {
-          page += 1;
-          fetchProjects().finally(() => {
-            loading = false;
-            document.getElementById("loadingMore").classList.add("hidden");
-          });
+          fetchProjects().finally(finishLoading);
         }
       });
 
-      fetchProjects().finally(() => {
-        loading = false;
-        document.getElementById("loadingMore").classList.add("hidden");
-      });
+      fetchProjects().finally(finishLoading);
     </script>
   </body>
 </html>
