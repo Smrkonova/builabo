@@ -43,12 +43,12 @@
               <h1 style="margin-top: 1rem; font-size: clamp(3rem, 6vw, 4.5rem)">${project.title}</h1>
               <div class="detail-facts">
                 <div class="detail-fact"><h3>Location</h3><p>${project.location || "—"}</p></div>
-                <div class="detail-fact"><h3>Area</h3><p>${project.sqft ? project.sqft + " sq.ft" : "—"}</p></div>
-                <div class="detail-fact"><h3>Year</h3><p>${project.year || "—"}</p></div>
               </div>
               <div class="detail-about">
                 <h2>About the Project</h2>
                 <p>${project.description || "Details coming soon."}</p>
+                <div class="detail-fact"><h3>Area</h3><p>${project.sqft ? project.sqft + " sq.ft" : "—"}</p></div>
+                <div class="detail-fact"><h3>Year</h3><p>${project.year || "—"}</p></div>
               </div>
               ${
                 gallery.length
